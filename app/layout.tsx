@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Inventario",
-  description: "Inventario de Insumos",
+  title: "Jean Zeck Inventory",
+  description: "Clothing inventory management: stock, movements and metrics.",
 };
 
 export default function RootLayout({
