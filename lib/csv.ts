@@ -1,4 +1,4 @@
-import { productStatus, STATUS_LABELS, type Product } from "./types";
+import { productStatus, STATUS_LABELS, type Movement, type Product } from "./types";
 
 function toCsvRow(values: (string | number)[]): string {
   return values
@@ -21,6 +21,22 @@ export function productsToCsv(products: Product[]): string {
       product.price.toFixed(2),
       product.stock,
       STATUS_LABELS[productStatus(product)],
+    ]),
+  );
+  return [toCsvRow(header), ...rows].join("\n");
+}
+
+export function movementsToCsv(movements: Movement[]): string {
+  const header = ["Date", "SKU", "Product", "Type", "Quantity", "Resulting stock", "Reason"];
+  const rows = movements.map((m) =>
+    toCsvRow([
+      m.createdAt,
+      m.sku,
+      m.productName,
+      m.type,
+      m.quantity,
+      m.resultingStock,
+      m.reason ?? "",
     ]),
   );
   return [toCsvRow(header), ...rows].join("\n");

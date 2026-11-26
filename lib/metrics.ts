@@ -30,6 +30,21 @@ export interface MovedProduct {
   unitsMoved: number;
 }
 
+export interface CategoryValue {
+  category: string;
+  value: number;
+}
+
+export function valueByCategory(products: Product[]): CategoryValue[] {
+  const totals = new Map<string, number>();
+  for (const product of products) {
+    totals.set(product.category, (totals.get(product.category) ?? 0) + product.price * product.stock);
+  }
+  return [...totals.entries()]
+    .map(([category, value]) => ({ category, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
 export function mostMoved(movements: Movement[], limit = 5): MovedProduct[] {
   const totals = new Map<string, MovedProduct>();
   for (const movement of movements) {

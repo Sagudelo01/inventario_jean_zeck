@@ -5,8 +5,8 @@ import { deleteProduct, resetInventory, useMovements, useProducts } from "@/lib/
 import { useT } from "@/lib/i18n";
 import { toast } from "@/lib/toast";
 import { productStatus, type Product } from "@/lib/types";
-import { computeMetrics, mostMoved } from "@/lib/metrics";
-import { productsToCsv, downloadCsv } from "@/lib/csv";
+import { computeMetrics, mostMoved, valueByCategory } from "@/lib/metrics";
+import { productsToCsv, movementsToCsv, downloadCsv } from "@/lib/csv";
 import {
   EMPTY_FILTERS,
   filterProducts,
@@ -18,6 +18,8 @@ import {
   type SortKey,
 } from "@/lib/query";
 import { MetricsCards } from "@/components/MetricsCards";
+import { CategoryBreakdown } from "@/components/CategoryBreakdown";
+import { Download } from "lucide-react";
 import { LowStockAlert } from "@/components/LowStockAlert";
 import { Toolbar } from "@/components/Toolbar";
 import { InventoryTable } from "@/components/InventoryTable";
@@ -27,7 +29,7 @@ import { ProductFormDialog } from "@/components/ProductFormDialog";
 import { MovementDialog } from "@/components/MovementDialog";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZES = [8, 16, 24];
 type Tab = "inventory" | "movements";
 
 export default function Page() {
@@ -39,6 +41,7 @@ export default function Page() {
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [tab, setTab] = useState<Tab>("inventory");
 
   const [productDialog, setProductDialog] = useState<{ open: boolean; editing: Product | null }>({ open: false, editing: null });
@@ -56,13 +59,14 @@ export default function Page() {
 
   const metrics = useMemo(() => computeMetrics(products), [products]);
   const moved = useMemo(() => mostMoved(movements), [movements]);
+  const categoryValues = useMemo(() => valueByCategory(products), [products]);
   const lowStockProducts = useMemo(() => products.filter((p) => productStatus(p) !== "in_stock"), [products]);
 
   const sorted = useMemo(
     () => sortProducts(filterProducts(products, filters), sortKey, sortDirection),
     [products, filters, sortKey, sortDirection],
   );
-  const pageData = useMemo(() => paginate(sorted, page, PAGE_SIZE), [sorted, page]);
+  const pageData = useMemo(() => paginate(sorted, page, pageSize), [sorted, page, pageSize]);
 
   function changeFilters(patch: Partial<Filters>) {
     setFilters((prev) => ({ ...prev, ...patch }));
@@ -84,8 +88,15 @@ export default function Page() {
     setTab("inventory");
   }
 
+  const today = () => new Date().toISOString().slice(0, 10);
+
   function exportCsv() {
-    downloadCsv(`jean-zeck-inventory-${new Date().toISOString().slice(0, 10)}.csv`, productsToCsv(sorted));
+    downloadCsv(`jean-zeck-inventory-${today()}.csv`, productsToCsv(sorted));
+    toast("toast.exported");
+  }
+
+  function exportMovements() {
+    downloadCsv(`jean-zeck-movements-${today()}.csv`, movementsToCsv(movements));
     toast("toast.exported");
   }
 
@@ -104,6 +115,7 @@ export default function Page() {
 
       <div className="space-y-6">
         <MetricsCards metrics={metrics} moved={moved} />
+        <CategoryBreakdown data={categoryValues} />
         <LowStockAlert products={lowStockProducts} onReview={reviewLowStock} />
 
         <div role="tablist" aria-label="Inventory views" className="flex gap-1 border-b border-border">
@@ -131,12 +143,30 @@ export default function Page() {
                   onMove={(product) => setMovementProduct(product)}
                   onDelete={(product) => setDeleteTarget(product)}
                 />
-                <Pagination page={pageData.page} pageCount={pageData.pageCount} total={pageData.total} onPageChange={setPage} />
+                <Pagination
+                  page={pageData.page}
+                  pageCount={pageData.pageCount}
+                  total={pageData.total}
+                  pageSize={pageSize}
+                  pageSizes={PAGE_SIZES}
+                  onPageChange={setPage}
+                  onPageSizeChange={(size) => {
+                    setPageSize(size);
+                    setPage(1);
+                  }}
+                />
               </>
             )}
           </div>
         ) : (
-          <div id="panel-movements" role="tabpanel" aria-labelledby="tab-movements" className="animate-rise">
+          <div id="panel-movements" role="tabpanel" aria-labelledby="tab-movements" className="animate-rise space-y-4">
+            {movements.length > 0 ? (
+              <div className="flex justify-end">
+                <button type="button" onClick={exportMovements} className="flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium hover:bg-surface-2">
+                  <Download size={16} /> {t("mv.exportCsv")}
+                </button>
+              </div>
+            ) : null}
             <MovementsTable movements={movements} />
           </div>
         )}
