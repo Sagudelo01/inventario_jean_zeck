@@ -25,3 +25,17 @@ export const STATUS_LABELS: Record<ProductStatus, string> = {
   low_stock: "Low stock",
   out_of_stock: "Out of stock",
 };
+
+export type MovementType = "in" | "out";
+
+export interface Movement {
+  id: string;
+  productId: string;
+  sku: string;
+  productName: string;
+  type: MovementType;
+  quantity: number;
+  reason?: string;
+  resultingStock: number;
+  createdAt: string;
+}
