@@ -17,7 +17,7 @@ function Card({ label, value, hint }: { label: string; value: string; hint?: str
 export function MetricsCards({ metrics, moved }: { metrics: InventoryMetrics; moved: MovedProduct[] }) {
   const t = useT();
   return (
-    <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4" aria-label={t("app.subtitle")}>
+    <section className="animate-rise grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4" aria-label={t("app.subtitle")}>
       <Card label={t("metric.value")} value={formatCurrency(metrics.inventoryValue)} hint={t("metric.value.hint", { n: metrics.totalUnits })} />
       <Card label={t("metric.products")} value={String(metrics.totalProducts)} hint={t("metric.products.hint")} />
       <Card label={t("metric.low")} value={String(metrics.lowStock)} hint={t("metric.low.hint")} />

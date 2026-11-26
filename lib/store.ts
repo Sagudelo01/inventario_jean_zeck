@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { loadMovements, loadProducts, saveMovements, saveProducts } from "./storage";
 import { SEED_PRODUCTS } from "./seed";
+import { toast } from "./toast";
 import type { Movement, MovementType, Product } from "./types";
 import type { ProductDraft } from "./validation";
 
@@ -60,6 +61,7 @@ export function createProduct(draft: ProductDraft): Product {
   const product: Product = { id: newId("p"), ...draftToFields(draft), createdAt: now, updatedAt: now };
   commitProducts([product, ...currentProducts()]);
   emit();
+  toast("toast.created");
   return product;
 }
 
@@ -69,11 +71,13 @@ export function updateProduct(id: string, draft: ProductDraft): void {
     currentProducts().map((p) => (p.id === id ? { ...p, ...draftToFields(draft), updatedAt: now } : p)),
   );
   emit();
+  toast("toast.updated");
 }
 
 export function deleteProduct(id: string): void {
   commitProducts(currentProducts().filter((p) => p.id !== id));
   emit();
+  toast("toast.deleted");
 }
 
 export function recordMovement(
@@ -106,12 +110,14 @@ export function recordMovement(
   };
   commitMovements([movement, ...currentMovements()]);
   emit();
+  toast("toast.movement");
 }
 
 export function resetInventory(): void {
   commitProducts(SEED_PRODUCTS);
   commitMovements([]);
   emit();
+  toast("toast.reset");
 }
 
 function subscribe(listener: () => void): () => void {

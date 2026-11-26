@@ -50,3 +50,82 @@ body {
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* Dialog enter/exit animation */
+dialog {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    overlay 0.18s ease allow-discrete,
+    display 0.18s ease allow-discrete;
+}
+dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+dialog::backdrop {
+  background: rgb(0 0 0 / 0);
+  transition:
+    background 0.18s ease,
+    overlay 0.18s ease allow-discrete,
+    display 0.18s ease allow-discrete;
+}
+dialog[open]::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+@starting-style {
+  dialog[open]::backdrop {
+    background: rgb(0 0 0 / 0);
+  }
+}
+
+/* Subtle entrance for content blocks */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise 0.4s ease both;
+}
+
+/* Toast lifecycle (enter and exit in one animation) */
+@keyframes toast-life {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  8%,
+  86% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog,
+  dialog::backdrop {
+    transition: none;
+  }
+  .animate-rise,
+  [data-toast] {
+    animation: none;
+  }
+}

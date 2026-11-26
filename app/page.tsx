@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { deleteProduct, resetInventory, useMovements, useProducts } from "@/lib/store";
 import { useT } from "@/lib/i18n";
+import { toast } from "@/lib/toast";
 import { productStatus, type Product } from "@/lib/types";
 import { computeMetrics, mostMoved } from "@/lib/metrics";
 import { productsToCsv, downloadCsv } from "@/lib/csv";
@@ -85,6 +86,7 @@ export default function Page() {
 
   function exportCsv() {
     downloadCsv(`jean-zeck-inventory-${new Date().toISOString().slice(0, 10)}.csv`, productsToCsv(sorted));
+    toast("toast.exported");
   }
 
   function handleReset() {
@@ -112,7 +114,7 @@ export default function Page() {
         </div>
 
         {tab === "inventory" ? (
-          <div id="panel-inventory" role="tabpanel" aria-labelledby="tab-inventory" className="space-y-4">
+          <div id="panel-inventory" role="tabpanel" aria-labelledby="tab-inventory" className="animate-rise space-y-4">
             <Toolbar filters={filters} onChange={changeFilters} options={options} onAdd={() => setProductDialog({ open: true, editing: null })} onExport={exportCsv} onReset={handleReset} />
             {pageData.total === 0 ? (
               <div className="rounded-xl border border-dashed border-border bg-surface p-10 text-center text-sm text-muted">
@@ -134,7 +136,7 @@ export default function Page() {
             )}
           </div>
         ) : (
-          <div id="panel-movements" role="tabpanel" aria-labelledby="tab-movements">
+          <div id="panel-movements" role="tabpanel" aria-labelledby="tab-movements" className="animate-rise">
             <MovementsTable movements={movements} />
           </div>
         )}
