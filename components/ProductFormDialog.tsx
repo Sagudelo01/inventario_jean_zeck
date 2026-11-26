@@ -86,10 +86,10 @@ export function ProductFormDialog({ open, onClose, editing, products }: ProductF
           </Field>
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-50">
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-surface-2">
             Cancel
           </button>
-          <button type="submit" className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700">
+          <button type="submit" className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90">
             {editing ? "Save changes" : "Add product"}
           </button>
         </div>
@@ -99,17 +99,17 @@ export function ProductFormDialog({ open, onClose, editing, products }: ProductF
 }
 
 function inputClass(error?: string): string {
-  return `w-full rounded-md border px-3 py-2 text-sm focus:outline-none ${
-    error ? "border-rose-400 focus:border-rose-500" : "border-zinc-300 focus:border-zinc-500"
+  return `w-full rounded-md border bg-surface px-3 py-2 text-sm text-fg focus:outline-none ${
+    error ? "border-rose-400 focus:border-rose-500" : "border-border focus:border-accent"
   }`;
 }
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <label className="block text-sm">
-      <span className="mb-1 block font-medium text-zinc-700">{label}</span>
+      <span className="mb-1 block font-medium text-fg">{label}</span>
       {children}
-      {error ? <span className="mt-1 block text-xs text-rose-600">{error}</span> : null}
+      {error ? <span className="mt-1 block text-xs text-rose-600 dark:text-rose-400">{error}</span> : null}
     </label>
   );
 }

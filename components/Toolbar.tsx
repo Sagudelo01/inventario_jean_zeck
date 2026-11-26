@@ -13,20 +13,22 @@ interface ToolbarProps {
 }
 
 const selectClass =
-  "rounded-md border border-zinc-300 bg-white px-2 py-2 text-sm focus:border-zinc-500 focus:outline-none";
+  "rounded-md border border-border bg-surface px-2 py-2 text-sm text-fg focus:border-accent focus:outline-none";
+const ghostButton =
+  "flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium hover:bg-surface-2";
 
 export function Toolbar({ filters, onChange, options, onAdd, onExport, onReset }: ToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <label className="relative flex-1 min-w-48">
-        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+      <label className="relative min-w-48 flex-1">
+        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
         <span className="sr-only">Search products</span>
         <input
           type="search"
           value={filters.search}
           onChange={(e) => onChange({ search: e.target.value })}
           placeholder="Search by SKU, name or color"
-          className="w-full rounded-md border border-zinc-300 bg-white py-2 pl-9 pr-3 text-sm focus:border-zinc-500 focus:outline-none"
+          className="w-full rounded-md border border-border bg-surface py-2 pl-9 pr-3 text-sm text-fg placeholder:text-muted focus:border-accent focus:outline-none"
         />
       </label>
 
@@ -51,25 +53,25 @@ export function Toolbar({ filters, onChange, options, onAdd, onExport, onReset }
         ))}
       </select>
 
-      <label className="flex items-center gap-2 text-sm text-zinc-600">
+      <label className="flex items-center gap-2 text-sm text-muted">
         <input
           type="checkbox"
           checked={filters.lowStockOnly}
           onChange={(e) => onChange({ lowStockOnly: e.target.checked })}
-          className="h-4 w-4 rounded border-zinc-300"
+          className="h-4 w-4 rounded border-border accent-accent"
         />
         Low stock only
       </label>
 
       <div className="ml-auto flex items-center gap-2">
-        <button type="button" onClick={onExport} className="flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50">
-          <Download size={16} /> Export CSV
+        <button type="button" onClick={onExport} className={ghostButton}>
+          <Download size={16} /> <span className="hidden sm:inline">Export</span> CSV
         </button>
-        <button type="button" onClick={onReset} className="flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50">
+        <button type="button" onClick={onReset} className={ghostButton}>
           <RotateCcw size={16} /> Reset
         </button>
-        <button type="button" onClick={onAdd} className="flex items-center gap-1.5 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700">
-          <Plus size={16} /> Add product
+        <button type="button" onClick={onAdd} className="flex items-center gap-1.5 rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-fg hover:opacity-90">
+          <Plus size={16} /> <span className="hidden sm:inline">Add product</span><span className="sm:hidden">Add</span>
         </button>
       </div>
     </div>

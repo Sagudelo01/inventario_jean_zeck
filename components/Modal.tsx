@@ -27,15 +27,15 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
       onClick={(event) => {
         if (event.target === dialogRef.current) onClose();
       }}
-      className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-xl p-0 backdrop:bg-black/40"
+      className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-xl bg-surface p-0 text-fg shadow-xl backdrop:bg-black/50"
     >
-      <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+      <div className="flex items-center justify-between border-b border-border px-5 py-4">
         <h2 className="text-base font-semibold">{title}</h2>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+          className="rounded-md p-1 text-muted hover:bg-surface-2 hover:text-fg"
         >
           <X size={18} />
         </button>

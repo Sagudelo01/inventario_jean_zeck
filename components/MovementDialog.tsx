@@ -37,14 +37,14 @@ export function MovementDialog({ open, onClose, product }: MovementDialogProps) 
 
   const tabClass = (active: boolean) =>
     `flex-1 rounded-md border px-3 py-2 text-sm font-medium ${
-      active ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+      active ? "border-accent bg-accent text-accent-fg" : "border-border bg-surface text-fg hover:bg-surface-2"
     }`;
 
   return (
     <Modal open={open} onClose={onClose} title="Record movement">
-      <p className="mb-4 text-sm text-zinc-600">
-        {product.name} <span className="font-mono text-xs text-zinc-500">{product.sku}</span> · current stock{" "}
-        <span className="font-medium text-zinc-900">{product.stock}</span>
+      <p className="mb-4 text-sm text-muted">
+        {product.name} <span className="font-mono text-xs">{product.sku}</span> · current stock{" "}
+        <span className="font-medium text-fg">{product.stock}</span>
       </p>
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="flex gap-2">
@@ -52,29 +52,29 @@ export function MovementDialog({ open, onClose, product }: MovementDialogProps) 
           <button type="button" className={tabClass(type === "out")} onClick={() => setType("out")}>Stock out</button>
         </div>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-zinc-700">Quantity</span>
+          <span className="mb-1 block font-medium text-fg">Quantity</span>
           <input
             type="number"
             min="1"
             step="1"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
-            className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none ${error ? "border-rose-400" : "border-zinc-300 focus:border-zinc-500"}`}
+            className={`w-full rounded-md border bg-surface px-3 py-2 text-sm text-fg focus:outline-none ${error ? "border-rose-400" : "border-border focus:border-accent"}`}
           />
-          {error ? <span className="mt-1 block text-xs text-rose-600">{error}</span> : null}
+          {error ? <span className="mt-1 block text-xs text-rose-600 dark:text-rose-400">{error}</span> : null}
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-zinc-700">Reason <span className="text-zinc-400">(optional)</span></span>
+          <span className="mb-1 block font-medium text-fg">Reason <span className="text-muted">(optional)</span></span>
           <input
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="e.g. new shipment, sale, correction"
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg placeholder:text-muted focus:border-accent focus:outline-none"
           />
         </label>
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-50">Cancel</button>
-          <button type="submit" className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700">Record</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-surface-2">Cancel</button>
+          <button type="submit" className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90">Record</button>
         </div>
       </form>
     </Modal>

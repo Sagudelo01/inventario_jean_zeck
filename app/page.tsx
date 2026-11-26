@@ -92,28 +92,28 @@ export default function Page() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8">
+    <main id="main" className="mx-auto w-full max-w-6xl px-4 py-8">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold">Jean Zeck Inventory</h1>
-        <p className="text-sm text-zinc-500">Clothing stock, movements and metrics</p>
+        <h1 className="text-2xl font-semibold">Inventory</h1>
+        <p className="text-sm text-muted">Clothing stock, movements and metrics</p>
       </header>
 
       <div className="space-y-6">
         <MetricsCards metrics={metrics} moved={moved} />
         <LowStockAlert products={lowStockProducts} onReview={reviewLowStock} />
 
-        <div className="flex gap-1 border-b border-zinc-200">
-          <TabButton active={tab === "inventory"} onClick={() => setTab("inventory")}>Inventory</TabButton>
-          <TabButton active={tab === "movements"} onClick={() => setTab("movements")}>
+        <div role="tablist" aria-label="Inventory views" className="flex gap-1 border-b border-border">
+          <TabButton id="inventory" active={tab === "inventory"} onClick={() => setTab("inventory")}>Inventory</TabButton>
+          <TabButton id="movements" active={tab === "movements"} onClick={() => setTab("movements")}>
             Movements {movements.length > 0 ? `(${movements.length})` : ""}
           </TabButton>
         </div>
 
         {tab === "inventory" ? (
-          <div className="space-y-4">
+          <div id="panel-inventory" role="tabpanel" aria-labelledby="tab-inventory" className="space-y-4">
             <Toolbar filters={filters} onChange={changeFilters} options={options} onAdd={() => setProductDialog({ open: true, editing: null })} onExport={exportCsv} onReset={handleReset} />
             {pageData.total === 0 ? (
-              <div className="rounded-lg border border-dashed border-zinc-300 p-10 text-center text-sm text-zinc-500">
+              <div className="rounded-xl border border-dashed border-border bg-surface p-10 text-center text-sm text-muted">
                 No products match the current filters.
               </div>
             ) : (
@@ -132,7 +132,9 @@ export default function Page() {
             )}
           </div>
         ) : (
-          <MovementsTable movements={movements} />
+          <div id="panel-movements" role="tabpanel" aria-labelledby="tab-movements">
+            <MovementsTable movements={movements} />
+          </div>
         )}
       </div>
 
@@ -163,13 +165,17 @@ export default function Page() {
   );
 }
 
-function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function TabButton({ id, active, onClick, children }: { id: string; active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       type="button"
+      role="tab"
+      id={`tab-${id}`}
+      aria-selected={active}
+      aria-controls={`panel-${id}`}
       onClick={onClick}
       className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
-        active ? "border-zinc-900 text-zinc-900" : "border-transparent text-zinc-500 hover:text-zinc-800"
+        active ? "border-accent text-fg" : "border-transparent text-muted hover:text-fg"
       }`}
     >
       {children}

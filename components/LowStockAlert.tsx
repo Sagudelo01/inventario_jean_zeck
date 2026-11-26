@@ -10,7 +10,10 @@ export function LowStockAlert({ products, onReview }: { products: Product[]; onR
   const extra = products.length > 3 ? ` and ${products.length - 3} more` : "";
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+    <div
+      role="status"
+      className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200"
+    >
       <AlertTriangle size={18} className="shrink-0" />
       <p>
         <span className="font-medium">{products.length} product(s) need restocking:</span> {names}
@@ -19,7 +22,7 @@ export function LowStockAlert({ products, onReview }: { products: Product[]; onR
       <button
         type="button"
         onClick={onReview}
-        className="ml-auto rounded-md border border-amber-300 px-3 py-1 font-medium hover:bg-amber-100"
+        className="ml-auto rounded-md border border-amber-400/60 px-3 py-1 font-medium hover:bg-amber-100 dark:hover:bg-amber-500/15"
       >
         Review
       </button>
