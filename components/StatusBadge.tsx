@@ -1,4 +1,7 @@
-import { STATUS_LABELS, type ProductStatus } from "@/lib/types";
+"use client";
+
+import { useT } from "@/lib/i18n";
+import type { ProductStatus } from "@/lib/types";
 
 const STYLES: Record<ProductStatus, string> = {
   in_stock: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
@@ -7,9 +10,10 @@ const STYLES: Record<ProductStatus, string> = {
 };
 
 export function StatusBadge({ status }: { status: ProductStatus }) {
+  const t = useT();
   return (
     <span className={`inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${STYLES[status]}`}>
-      {STATUS_LABELS[status]}
+      {t(`status.${status}`)}
     </span>
   );
 }

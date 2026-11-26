@@ -1,10 +1,13 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 const STORAGE_KEY = "jeanzeck:theme";
 
 export function ThemeToggle() {
+  const t = useT();
+
   function toggle() {
     const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
@@ -19,7 +22,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label="Toggle light and dark theme"
+      aria-label={t("theme.toggle")}
       className="grid h-8 w-8 place-items-center rounded-lg border border-border text-muted hover:text-fg"
     >
       <Moon size={16} className="block dark:hidden" />

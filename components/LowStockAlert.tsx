@@ -1,13 +1,17 @@
+"use client";
+
 import { AlertTriangle } from "lucide-react";
+import { useT } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
 
 export function LowStockAlert({ products, onReview }: { products: Product[]; onReview: () => void }) {
+  const t = useT();
   if (products.length === 0) return null;
   const names = products
     .slice(0, 3)
     .map((p) => `${p.name} (${p.sku})`)
     .join(", ");
-  const extra = products.length > 3 ? ` and ${products.length - 3} more` : "";
+  const extra = products.length > 3 ? t("alert.more", { n: products.length - 3 }) : "";
 
   return (
     <div
@@ -16,7 +20,7 @@ export function LowStockAlert({ products, onReview }: { products: Product[]; onR
     >
       <AlertTriangle size={18} className="shrink-0" />
       <p>
-        <span className="font-medium">{products.length} product(s) need restocking:</span> {names}
+        <span className="font-medium">{t("alert.restock", { n: products.length })}</span> {names}
         {extra}.
       </p>
       <button
@@ -24,7 +28,7 @@ export function LowStockAlert({ products, onReview }: { products: Product[]; onR
         onClick={onReview}
         className="ml-auto rounded-md border border-amber-400/60 px-3 py-1 font-medium hover:bg-amber-100 dark:hover:bg-amber-500/15"
       >
-        Review
+        {t("alert.review")}
       </button>
     </div>
   );

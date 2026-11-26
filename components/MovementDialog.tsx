@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { recordMovement } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 import type { MovementType, Product } from "@/lib/types";
 import { Modal } from "./Modal";
 
@@ -12,6 +13,7 @@ interface MovementDialogProps {
 }
 
 export function MovementDialog({ open, onClose, product }: MovementDialogProps) {
+  const t = useT();
   const [type, setType] = useState<MovementType>("in");
   const [quantity, setQuantity] = useState("1");
   const [reason, setReason] = useState("");
@@ -24,11 +26,11 @@ export function MovementDialog({ open, onClose, product }: MovementDialogProps) 
     if (!product) return;
     const amount = Number(quantity);
     if (!Number.isInteger(amount) || amount <= 0) {
-      setError("Enter a whole number greater than zero.");
+      setError(t("err.qty.invalid"));
       return;
     }
     if (type === "out" && amount > product.stock) {
-      setError(`Only ${product.stock} unit(s) available.`);
+      setError(t("err.qty.available", { n: product.stock }));
       return;
     }
     recordMovement(product.id, type, amount, reason);
@@ -36,23 +38,23 @@ export function MovementDialog({ open, onClose, product }: MovementDialogProps) 
   }
 
   const tabClass = (active: boolean) =>
-    `flex-1 rounded-md border px-3 py-2 text-sm font-medium ${
+    `flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
       active ? "border-accent bg-accent text-accent-fg" : "border-border bg-surface text-fg hover:bg-surface-2"
     }`;
 
   return (
-    <Modal open={open} onClose={onClose} title="Record movement">
+    <Modal open={open} onClose={onClose} title={t("movement.title")}>
       <p className="mb-4 text-sm text-muted">
-        {product.name} <span className="font-mono text-xs">{product.sku}</span> · current stock{" "}
+        {product.name} <span className="font-mono text-xs">{product.sku}</span> · {t("movement.currentStock")}{" "}
         <span className="font-medium text-fg">{product.stock}</span>
       </p>
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="flex gap-2">
-          <button type="button" className={tabClass(type === "in")} onClick={() => setType("in")}>Stock in</button>
-          <button type="button" className={tabClass(type === "out")} onClick={() => setType("out")}>Stock out</button>
+          <button type="button" className={tabClass(type === "in")} onClick={() => setType("in")}>{t("movement.stockIn")}</button>
+          <button type="button" className={tabClass(type === "out")} onClick={() => setType("out")}>{t("movement.stockOut")}</button>
         </div>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-fg">Quantity</span>
+          <span className="mb-1 block font-medium text-fg">{t("movement.quantity")}</span>
           <input
             type="number"
             min="1"
@@ -64,17 +66,17 @@ export function MovementDialog({ open, onClose, product }: MovementDialogProps) 
           {error ? <span className="mt-1 block text-xs text-rose-600 dark:text-rose-400">{error}</span> : null}
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-fg">Reason <span className="text-muted">(optional)</span></span>
+          <span className="mb-1 block font-medium text-fg">{t("movement.reason")} <span className="text-muted">{t("movement.optional")}</span></span>
           <input
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="e.g. new shipment, sale, correction"
+            placeholder={t("movement.reasonPlaceholder")}
             className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg placeholder:text-muted focus:border-accent focus:outline-none"
           />
         </label>
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-surface-2">Cancel</button>
-          <button type="submit" className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90">Record</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-surface-2">{t("form.cancel")}</button>
+          <button type="submit" className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90">{t("movement.record")}</button>
         </div>
       </form>
     </Modal>

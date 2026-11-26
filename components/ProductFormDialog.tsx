@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { createProduct, updateProduct } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 import { hasErrors, validateProduct, type ProductDraft, type ProductErrors } from "@/lib/validation";
 import type { Product } from "@/lib/types";
 import { Modal } from "./Modal";
@@ -39,8 +40,10 @@ function toDraft(product: Product | null): ProductDraft {
 }
 
 export function ProductFormDialog({ open, onClose, editing, products }: ProductFormDialogProps) {
+  const t = useT();
   const [draft, setDraft] = useState<ProductDraft>(() => toDraft(editing));
   const [errors, setErrors] = useState<ProductErrors>({});
+  const err = (key?: string) => (key ? t(key) : undefined);
 
   function update(field: keyof ProductDraft, value: string) {
     setDraft((prev) => ({ ...prev, [field]: value }));
@@ -57,40 +60,40 @@ export function ProductFormDialog({ open, onClose, editing, products }: ProductF
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={editing ? "Edit product" : "Add product"}>
+    <Modal open={open} onClose={onClose} title={editing ? t("form.edit") : t("form.add")}>
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="Name" error={errors.name}>
+          <Field label={t("form.name")} error={err(errors.name)}>
             <input className={inputClass(errors.name)} value={draft.name} onChange={(e) => update("name", e.target.value)} />
           </Field>
-          <Field label="SKU" error={errors.sku}>
+          <Field label={t("form.sku")} error={err(errors.sku)}>
             <input className={inputClass(errors.sku)} value={draft.sku} onChange={(e) => update("sku", e.target.value)} />
           </Field>
-          <Field label="Category" error={errors.category}>
+          <Field label={t("form.category")} error={err(errors.category)}>
             <input className={inputClass(errors.category)} value={draft.category} onChange={(e) => update("category", e.target.value)} />
           </Field>
-          <Field label="Size" error={errors.size}>
+          <Field label={t("form.size")} error={err(errors.size)}>
             <input className={inputClass(errors.size)} value={draft.size} onChange={(e) => update("size", e.target.value)} />
           </Field>
-          <Field label="Color" error={errors.color}>
+          <Field label={t("form.color")} error={err(errors.color)}>
             <input className={inputClass(errors.color)} value={draft.color} onChange={(e) => update("color", e.target.value)} />
           </Field>
-          <Field label="Price (USD)" error={errors.price}>
+          <Field label={t("form.price")} error={err(errors.price)}>
             <input type="number" step="0.01" min="0" className={inputClass(errors.price)} value={draft.price} onChange={(e) => update("price", e.target.value)} />
           </Field>
-          <Field label="Stock" error={errors.stock}>
+          <Field label={t("form.stock")} error={err(errors.stock)}>
             <input type="number" step="1" min="0" className={inputClass(errors.stock)} value={draft.stock} onChange={(e) => update("stock", e.target.value)} />
           </Field>
-          <Field label="Low-stock threshold" error={errors.lowStockThreshold}>
+          <Field label={t("form.threshold")} error={err(errors.lowStockThreshold)}>
             <input type="number" step="1" min="0" className={inputClass(errors.lowStockThreshold)} value={draft.lowStockThreshold} onChange={(e) => update("lowStockThreshold", e.target.value)} />
           </Field>
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-surface-2">
-            Cancel
+            {t("form.cancel")}
           </button>
           <button type="submit" className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90">
-            {editing ? "Save changes" : "Add product"}
+            {editing ? t("form.save") : t("form.create")}
           </button>
         </div>
       </form>

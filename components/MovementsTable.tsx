@@ -1,12 +1,16 @@
+"use client";
+
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { formatDate } from "@/lib/format";
+import { useT } from "@/lib/i18n";
 import type { Movement } from "@/lib/types";
 
 export function MovementsTable({ movements }: { movements: Movement[] }) {
+  const t = useT();
   if (movements.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border bg-surface p-10 text-center text-sm text-muted">
-        No movements recorded yet. Use the movement action on a product to log stock in or out.
+        {t("mv.empty")}
       </div>
     );
   }
@@ -16,12 +20,12 @@ export function MovementsTable({ movements }: { movements: Movement[] }) {
       <table className="w-full min-w-[640px] text-left text-sm">
         <thead className="border-b border-border bg-surface-2 text-muted">
           <tr>
-            <th className="px-4 py-3 font-medium">Date</th>
-            <th className="px-4 py-3 font-medium">Product</th>
-            <th className="px-4 py-3 font-medium">Type</th>
-            <th className="px-4 py-3 text-right font-medium">Quantity</th>
-            <th className="px-4 py-3 text-right font-medium">Resulting stock</th>
-            <th className="px-4 py-3 font-medium">Reason</th>
+            <th className="px-4 py-3 font-medium">{t("mv.date")}</th>
+            <th className="px-4 py-3 font-medium">{t("mv.product")}</th>
+            <th className="px-4 py-3 font-medium">{t("mv.type")}</th>
+            <th className="px-4 py-3 text-right font-medium">{t("mv.qty")}</th>
+            <th className="px-4 py-3 text-right font-medium">{t("mv.result")}</th>
+            <th className="px-4 py-3 font-medium">{t("mv.reason")}</th>
           </tr>
         </thead>
         <tbody>
@@ -34,9 +38,9 @@ export function MovementsTable({ movements }: { movements: Movement[] }) {
               </td>
               <td className="px-4 py-3">
                 {movement.type === "in" ? (
-                  <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400"><ArrowDownLeft size={14} /> In</span>
+                  <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400"><ArrowDownLeft size={14} /> {t("mv.in")}</span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-rose-600 dark:text-rose-400"><ArrowUpRight size={14} /> Out</span>
+                  <span className="inline-flex items-center gap-1 text-rose-600 dark:text-rose-400"><ArrowUpRight size={14} /> {t("mv.out")}</span>
                 )}
               </td>
               <td className="px-4 py-3 text-right tabular-nums">{movement.type === "in" ? "+" : "−"}{movement.quantity}</td>

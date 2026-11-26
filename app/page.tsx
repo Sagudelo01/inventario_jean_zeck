@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { deleteProduct, resetInventory, useMovements, useProducts } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 import { productStatus, type Product } from "@/lib/types";
 import { computeMetrics, mostMoved } from "@/lib/metrics";
 import { productsToCsv, downloadCsv } from "@/lib/csv";
@@ -29,6 +30,7 @@ const PAGE_SIZE = 8;
 type Tab = "inventory" | "movements";
 
 export default function Page() {
+  const t = useT();
   const products = useProducts();
   const movements = useMovements();
 
@@ -94,8 +96,8 @@ export default function Page() {
   return (
     <main id="main" className="mx-auto w-full max-w-6xl px-4 py-8">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold">Inventory</h1>
-        <p className="text-sm text-muted">Clothing stock, movements and metrics</p>
+        <h1 className="text-2xl font-semibold">{t("app.title")}</h1>
+        <p className="text-sm text-muted">{t("app.subtitle")}</p>
       </header>
 
       <div className="space-y-6">
@@ -103,9 +105,9 @@ export default function Page() {
         <LowStockAlert products={lowStockProducts} onReview={reviewLowStock} />
 
         <div role="tablist" aria-label="Inventory views" className="flex gap-1 border-b border-border">
-          <TabButton id="inventory" active={tab === "inventory"} onClick={() => setTab("inventory")}>Inventory</TabButton>
+          <TabButton id="inventory" active={tab === "inventory"} onClick={() => setTab("inventory")}>{t("tab.inventory")}</TabButton>
           <TabButton id="movements" active={tab === "movements"} onClick={() => setTab("movements")}>
-            Movements {movements.length > 0 ? `(${movements.length})` : ""}
+            {t("tab.movements")} {movements.length > 0 ? `(${movements.length})` : ""}
           </TabButton>
         </div>
 
@@ -114,7 +116,7 @@ export default function Page() {
             <Toolbar filters={filters} onChange={changeFilters} options={options} onAdd={() => setProductDialog({ open: true, editing: null })} onExport={exportCsv} onReset={handleReset} />
             {pageData.total === 0 ? (
               <div className="rounded-xl border border-dashed border-border bg-surface p-10 text-center text-sm text-muted">
-                No products match the current filters.
+                {t("empty.filters")}
               </div>
             ) : (
               <>
@@ -153,8 +155,9 @@ export default function Page() {
       />
       <ConfirmDialog
         open={deleteTarget !== null}
-        title="Delete product"
-        message={deleteTarget ? `Delete "${deleteTarget.name}" (${deleteTarget.sku})? This cannot be undone.` : ""}
+        title={t("confirm.deleteTitle")}
+        message={deleteTarget ? t("confirm.deleteMsg", { name: deleteTarget.name, sku: deleteTarget.sku }) : ""}
+        confirmLabel={t("confirm.delete")}
         onConfirm={() => {
           if (deleteTarget) deleteProduct(deleteTarget.id);
           setDeleteTarget(null);
