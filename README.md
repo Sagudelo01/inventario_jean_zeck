@@ -2,6 +2,8 @@
 
 A clothing inventory dashboard for a small retailer. Track products by SKU, category, size, color, price and stock, record stock movements, and watch live metrics. It runs entirely in the browser with seed data and localStorage, so there is no backend to set up.
 
+**Live demo:** [sagudelo01.github.io/inventario_jean_zeck](https://sagudelo01.github.io/inventario_jean_zeck/)
+
 ![Dashboard](docs/dashboard.png)
 
 ## Features
