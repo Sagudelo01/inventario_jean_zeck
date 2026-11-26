@@ -1,66 +1,178 @@
 "use client";
 
-import { useProducts } from "@/lib/store";
-import { formatCurrency } from "@/lib/format";
-import { productStatus, STATUS_LABELS, type ProductStatus } from "@/lib/types";
+import { useMemo, useState } from "react";
+import { deleteProduct, resetInventory, useMovements, useProducts } from "@/lib/store";
+import { productStatus, type Product } from "@/lib/types";
+import { computeMetrics, mostMoved } from "@/lib/metrics";
+import { productsToCsv, downloadCsv } from "@/lib/csv";
+import {
+  EMPTY_FILTERS,
+  filterProducts,
+  paginate,
+  sortProducts,
+  uniqueValues,
+  type Filters,
+  type SortDirection,
+  type SortKey,
+} from "@/lib/query";
+import { MetricsCards } from "@/components/MetricsCards";
+import { LowStockAlert } from "@/components/LowStockAlert";
+import { Toolbar } from "@/components/Toolbar";
+import { InventoryTable } from "@/components/InventoryTable";
+import { Pagination } from "@/components/Pagination";
+import { MovementsTable } from "@/components/MovementsTable";
+import { ProductFormDialog } from "@/components/ProductFormDialog";
+import { MovementDialog } from "@/components/MovementDialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
-const STATUS_STYLES: Record<ProductStatus, string> = {
-  in_stock: "bg-emerald-100 text-emerald-700",
-  low_stock: "bg-amber-100 text-amber-700",
-  out_of_stock: "bg-rose-100 text-rose-700",
-};
+const PAGE_SIZE = 8;
+type Tab = "inventory" | "movements";
 
 export default function Page() {
   const products = useProducts();
+  const movements = useMovements();
+
+  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [page, setPage] = useState(1);
+  const [tab, setTab] = useState<Tab>("inventory");
+
+  const [productDialog, setProductDialog] = useState<{ open: boolean; editing: Product | null }>({ open: false, editing: null });
+  const [movementProduct, setMovementProduct] = useState<Product | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
+
+  const options = useMemo(
+    () => ({
+      categories: uniqueValues(products, "category"),
+      sizes: uniqueValues(products, "size"),
+      colors: uniqueValues(products, "color"),
+    }),
+    [products],
+  );
+
+  const metrics = useMemo(() => computeMetrics(products), [products]);
+  const moved = useMemo(() => mostMoved(movements), [movements]);
+  const lowStockProducts = useMemo(() => products.filter((p) => productStatus(p) !== "in_stock"), [products]);
+
+  const sorted = useMemo(
+    () => sortProducts(filterProducts(products, filters), sortKey, sortDirection),
+    [products, filters, sortKey, sortDirection],
+  );
+  const pageData = useMemo(() => paginate(sorted, page, PAGE_SIZE), [sorted, page]);
+
+  function changeFilters(patch: Partial<Filters>) {
+    setFilters((prev) => ({ ...prev, ...patch }));
+    setPage(1);
+  }
+
+  function handleSort(key: SortKey) {
+    if (key === sortKey) {
+      setSortDirection((dir) => (dir === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDirection("asc");
+    }
+  }
+
+  function reviewLowStock() {
+    setFilters({ ...EMPTY_FILTERS, lowStockOnly: true });
+    setPage(1);
+    setTab("inventory");
+  }
+
+  function exportCsv() {
+    downloadCsv(`jean-zeck-inventory-${new Date().toISOString().slice(0, 10)}.csv`, productsToCsv(sorted));
+  }
+
+  function handleReset() {
+    resetInventory();
+    setFilters(EMPTY_FILTERS);
+    setPage(1);
+  }
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-10">
-      <header className="mb-8">
+    <main className="mx-auto w-full max-w-6xl px-4 py-8">
+      <header className="mb-6">
         <h1 className="text-2xl font-semibold">Jean Zeck Inventory</h1>
-        <p className="text-sm text-zinc-500">Clothing stock overview</p>
+        <p className="text-sm text-zinc-500">Clothing stock, movements and metrics</p>
       </header>
 
-      {products.length === 0 ? (
-        <p className="text-sm text-zinc-500">No products yet.</p>
-      ) : (
-        <div className="overflow-x-auto rounded-lg border border-zinc-200">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 text-zinc-500">
-              <tr>
-                <th className="px-4 py-3 font-medium">SKU</th>
-                <th className="px-4 py-3 font-medium">Product</th>
-                <th className="px-4 py-3 font-medium">Category</th>
-                <th className="px-4 py-3 font-medium">Size</th>
-                <th className="px-4 py-3 font-medium">Color</th>
-                <th className="px-4 py-3 text-right font-medium">Price</th>
-                <th className="px-4 py-3 text-right font-medium">Stock</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => {
-                const status = productStatus(product);
-                return (
-                  <tr key={product.id} className="border-t border-zinc-100">
-                    <td className="px-4 py-3 font-mono text-xs">{product.sku}</td>
-                    <td className="px-4 py-3">{product.name}</td>
-                    <td className="px-4 py-3">{product.category}</td>
-                    <td className="px-4 py-3">{product.size}</td>
-                    <td className="px-4 py-3">{product.color}</td>
-                    <td className="px-4 py-3 text-right">{formatCurrency(product.price)}</td>
-                    <td className="px-4 py-3 text-right">{product.stock}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status]}`}>
-                        {STATUS_LABELS[status]}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      <div className="space-y-6">
+        <MetricsCards metrics={metrics} moved={moved} />
+        <LowStockAlert products={lowStockProducts} onReview={reviewLowStock} />
+
+        <div className="flex gap-1 border-b border-zinc-200">
+          <TabButton active={tab === "inventory"} onClick={() => setTab("inventory")}>Inventory</TabButton>
+          <TabButton active={tab === "movements"} onClick={() => setTab("movements")}>
+            Movements {movements.length > 0 ? `(${movements.length})` : ""}
+          </TabButton>
         </div>
-      )}
+
+        {tab === "inventory" ? (
+          <div className="space-y-4">
+            <Toolbar filters={filters} onChange={changeFilters} options={options} onAdd={() => setProductDialog({ open: true, editing: null })} onExport={exportCsv} onReset={handleReset} />
+            {pageData.total === 0 ? (
+              <div className="rounded-lg border border-dashed border-zinc-300 p-10 text-center text-sm text-zinc-500">
+                No products match the current filters.
+              </div>
+            ) : (
+              <>
+                <InventoryTable
+                  products={pageData.items}
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                  onEdit={(product) => setProductDialog({ open: true, editing: product })}
+                  onMove={(product) => setMovementProduct(product)}
+                  onDelete={(product) => setDeleteTarget(product)}
+                />
+                <Pagination page={pageData.page} pageCount={pageData.pageCount} total={pageData.total} onPageChange={setPage} />
+              </>
+            )}
+          </div>
+        ) : (
+          <MovementsTable movements={movements} />
+        )}
+      </div>
+
+      <ProductFormDialog
+        key={productDialog.editing?.id ?? "new"}
+        open={productDialog.open}
+        editing={productDialog.editing}
+        products={products}
+        onClose={() => setProductDialog((prev) => ({ ...prev, open: false }))}
+      />
+      <MovementDialog
+        key={movementProduct?.id ?? "none"}
+        open={movementProduct !== null}
+        product={movementProduct}
+        onClose={() => setMovementProduct(null)}
+      />
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Delete product"
+        message={deleteTarget ? `Delete "${deleteTarget.name}" (${deleteTarget.sku})? This cannot be undone.` : ""}
+        onConfirm={() => {
+          if (deleteTarget) deleteProduct(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        onClose={() => setDeleteTarget(null)}
+      />
     </main>
+  );
+}
+
+function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
+        active ? "border-zinc-900 text-zinc-900" : "border-transparent text-zinc-500 hover:text-zinc-800"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
