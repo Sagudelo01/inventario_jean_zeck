@@ -12,11 +12,13 @@ A clothing inventory dashboard for a small retailer. Track products by SKU, cate
 - Create, edit and delete products with inline form validation and clear error messages
 - Stock movements (in and out) that adjust stock and build a dated history
 - Search by SKU, name or color, plus filters by category, size, color and low stock
-- Sortable columns and pagination
+- Sortable columns and pagination with an adjustable page size
 - Low-stock alerts with a one-click review filter
-- Dashboard metrics: inventory value, product count, low and out-of-stock counts, and most-moved products
-- CSV export of the current view
-- Light and dark themes, responsive layout, and keyboard-accessible dialogs and tabs
+- Dashboard metrics: inventory value, product count, low and out-of-stock counts, most-moved products and value by category
+- CSV export of the current product view and of the movement history
+- English and Spanish throughout, with a language toggle that is remembered and defaults to the browser language
+- Light and dark themes, responsive layout, toast notifications and subtle motion
+- Accessible by design: keyboard-friendly dialogs and tabs, visible focus, and reduced-motion support
 
 ## Screenshots
 
