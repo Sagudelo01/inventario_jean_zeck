@@ -9,9 +9,9 @@
   --border: #e4e7ec;
   --fg: #0f172a;
   --muted: #64748b;
-  --accent: #7c3aed;
+  --accent: #4d594b;
   --accent-fg: #ffffff;
-  --accent-weak: #f4f1fe;
+  --accent-weak: #eef1ec;
 }
 
 [data-theme="dark"] {
@@ -21,9 +21,9 @@
   --border: #273140;
   --fg: #e8edf3;
   --muted: #93a0b2;
-  --accent: #8b5cf6;
+  --accent: #6b7a64;
   --accent-fg: #ffffff;
-  --accent-weak: #241a42;
+  --accent-weak: #212a1e;
 }
 
 @theme inline {
